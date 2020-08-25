@@ -13,7 +13,7 @@ binance_api_key = 'X'    #Enter your own API-key here
 binance_api_secret = 'X' #Enter your own API-secret here
 
 ### CONSTANTS
-binsizes = {"1m": 1, "3m": 3, "5m": 5, "30m": 30, "1h": 60, "1d": 1440}
+binsizes = {"1m": 1, "3m": 3, "5m": 5, "30m": 30, "1h": 60, "4h": 240, "1d": 1440}
 batch_size = 750
 binance_client = Client(api_key=binance_api_key, api_secret=binance_api_secret)
 
@@ -22,9 +22,7 @@ binance_client = Client(api_key=binance_api_key, api_secret=binance_api_secret)
 def minutes_of_new_data(symbol, kline_size, data, source):
     if len(data) > 0:  old = parser.parse(data["timestamp"].iloc[-1])
     elif source == "binance": old = datetime.strptime('1 Jan 2017', '%d %b %Y')
-    elif source == "bitmex": old = bitmex_client.Trade.Trade_getBucketed(symbol=symbol, binSize=kline_size, count=1, reverse=False).result()[0][0]['timestamp']
     if source == "binance": new = pd.to_datetime(binance_client.get_klines(symbol=symbol, interval=kline_size)[-1][0], unit='ms')
-    if source == "bitmex": new = bitmex_client.Trade.Trade_getBucketed(symbol=symbol, binSize=kline_size, count=1, reverse=True).result()[0][0]['timestamp']
     return old, new
 
 def get_all_binance(symbol, kline_size, save = False):
@@ -51,8 +49,8 @@ def get_all_binance(symbol, kline_size, save = False):
 
 
 # For Binance
-binance_symbols = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "VETUSDT"]
+binance_symbols = ["BTCUSDT", "ETHUSDT", "XRPUSDT", "VETUSDT", "XTZUSDT", "LINKUSDT", "BNBUSDT"]
+get_all_binance("BTCUSDT", '4h', save = True)
+get_all_binance("ETHUSDT", '1m', save = True)
 for symbol in binance_symbols:
     get_all_binance(symbol, '30m', save = True)
-    get_all_binance(symbol, '3m', save = True)
-    get_all_binance(symbol, '5m', save = True)
